@@ -40,18 +40,18 @@ int main() {
 
     std::cout << power[0][0] << " " << power[0][1] << "\n" << power[1][0] << " " << power[1][1] << "\n";
     */
-    Matrix<int> check(1, 1);
+    linalg::Matrix<int> check(1, 1);
     check(0, 0) = 2;
     std::cout << check(0, 0) << "\n";
 
-    const Matrix<int> check2 = {{1, 2}, {2, 3}};
+    const linalg::Matrix<int> check2 = {{1, 2}, {2, 3}};
     std::cout << check2(0, 1) << "\n";
     // check2(0, 1) = 5;
 
-    Matrix<int> m1 = {{1, 2}, {3, 4}};
-    Matrix<int> m2 = {{3, 4}, {5, 6}};
+    linalg::Matrix<int> m1 = {{1, 2}, {3, 4}};
+    linalg::Matrix<int> m2 = {{3, 4}, {5, 6}};
 
-    Matrix<int> mul;
+    linalg::Matrix<int> mul;
 
     mul = m1 * m2;
 
@@ -62,7 +62,34 @@ int main() {
         std::cout << "\n";
     }
 
-    std::cout << mul.trace();
+    std::cout << mul.trace() << "\n";
+
+    linalg::Matrix<int> d = {{1, 5, 6}, {4, 5, 3}, {7, 9, 2}};
+
+    std::cout << d.det() << "\n";
+
+    linalg::Matrix<int> t = {{1, 2, 3}, {4, 5, 6}};
+
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            std::cout << t(i, j) << " ";
+        }
+        std::cout << "\n";
+    }
+
+    linalg::Matrix<int> t2;
+    t2 = transpose(t);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            std::cout << t2(i, j) << " ";
+        }
+        std::cout << "\n";
+    }
+
+    std::cout << t.norm() << "\n";
+
+    std::cout << t << "\n";
 
     return 0;
 }
