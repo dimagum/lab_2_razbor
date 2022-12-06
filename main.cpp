@@ -48,5 +48,21 @@ int main() {
     std::cout << check2(0, 1) << "\n";
     // check2(0, 1) = 5;
 
+    Matrix<int> m1 = {{1, 2}, {3, 4}};
+    Matrix<int> m2 = {{3, 4}, {5, 6}};
+
+    Matrix<int> mul;
+
+    mul = m1 * m2;
+
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            std::cout << mul(i, j) << " ";
+        }
+        std::cout << "\n";
+    }
+
+    std::cout << mul.trace();
+
     return 0;
 }

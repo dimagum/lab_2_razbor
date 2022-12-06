@@ -2,7 +2,7 @@
 
 template <class T = double>
 class Matrix {
-    T** m_ptr;
+    T * m_ptr;
     unsigned m_rows;
     unsigned m_columns;
 public:
@@ -10,12 +10,11 @@ public:
         m_rows = r;
         m_columns = c;
 
-        m_ptr = new T*[r];
+        m_ptr = new T[r * c];
 
         for (int i = 0; i < r; ++i) {
-            m_ptr[i] = new T[c];
             for (int j = 0; j < c; ++j) {
-                m_ptr[i][j] = 0;
+                m_ptr[i * m_columns + j] = 0;
             }
         }
     }
@@ -23,12 +22,11 @@ public:
         m_rows = other.m_rows;
         m_columns = other.m_columns;
 
-        m_ptr = new T*[other.m_rows];
+        m_ptr = new T[other.m_rows * other.m_columns];
 
         for (int i = 0; i < other.m_rows; ++i) {
-            m_ptr[i] = new T[other.m_columns];
             for (int j = 0; j < other.m_columns; ++j) {
-                m_ptr[i][j] = other.m_ptr[i][j];
+                m_ptr[i * m_columns + j] = other.m_ptr[i * m_columns + j];
             }
         }
     }
@@ -44,48 +42,55 @@ public:
     Matrix(const std::initializer_list<T> & lst) {
         m_rows = lst.size();
         m_columns = 1;
-        m_ptr = new T*[m_rows];
+        m_ptr = new T[m_rows * m_columns];
         for (int i = 0; i < m_rows; ++i) {
-            m_ptr[i] = new T[1];
-            m_ptr[i][0] = *(lst.begin() + i);
+            m_ptr[i * m_columns + 0] = *(lst.begin() + i);
         }
     }
     Matrix(const std::initializer_list<std::initializer_list<T>> & lst) {
         m_rows = lst.size();
         m_columns = lst.begin()->size();
 
-        m_ptr = new T*[m_rows];
+        m_ptr = new T[m_rows * m_columns];
         for (int i = 0; i < m_rows; ++i) {
-            m_ptr[i] = new T[m_columns];
             for (int j = 0; j < m_columns; ++j) {
-                m_ptr[i][j] = *((lst.begin() + i)->begin() + j);
+                m_ptr[i * m_columns + j] = *((lst.begin() + i)->begin() + j);
             }
         }
 
     }
     ~Matrix() {
-        for (int i = 0; i < m_rows; ++i) {
-            delete [] m_ptr[i];
-        }
         delete [] m_ptr;
     }
-
-    /*
+/*
     class Proxy {
         T* ptr;
+        unsigned cols;
     public:
-        Proxy(T* other) {
+        Proxy(T* other, unsigned c) {
             ptr = other;
+            cols = c;
         }
         T & operator[](unsigned idx) {
+            if (idx >= cols) {
+                throw std::logic_error("index out of range\n");
+            }
             return ptr[idx];
         }
     };
 
-     Proxy operator[](unsigned idx) {
-        return Proxy(m_ptr[idx]);
+    Proxy operator[](unsigned idx) {
+        if (idx >= m_rows) {
+            throw std::logic_error("index out of range\n");
+        }
+        return Proxy(&m_ptr[idx], m_columns);
     }
-    */
+    Proxy operator[](unsigned idx) const {
+        if (idx >= m_rows) {
+            throw std::logic_error("index out of range\n");
+        }
+        return Proxy(&m_ptr[idx], m_columns);
+    }
 
     T * operator[](unsigned idx) {
         return m_ptr[idx];
@@ -94,7 +99,25 @@ public:
     // a = m[0][0];
 
     T * operator[](unsigned idx) const {
+        if (idx >= m_rows) {
+            throw std::logic_error("index out of range\n");
+        }
         return m_ptr[idx];
+    }
+*/
+    // m(1, 1);
+    T & operator()(int i, int j) {
+        if (i >= m_rows || j >= m_columns) {
+            throw std::logic_error("index out of range\n");
+        }
+        return m_ptr[i * m_columns + j];
+    }
+
+    const T & operator()(int i, int j) const {
+        if (i >= m_rows || j >= m_columns) {
+            throw std::logic_error("index out of range\n");
+        }
+        return m_ptr[i * m_columns + j];
     }
 
     Matrix<T> & operator=(const Matrix<T> & rhs) {
@@ -102,19 +125,15 @@ public:
             return *this;
         }
 
-        for (int i = 0; i < m_rows; ++i) {
-            delete [] m_ptr[i];
-        }
         delete [] m_ptr;
 
         m_rows = rhs.m_rows;
         m_columns = rhs.m_columns;
 
-        m_ptr = new T*[m_rows];
+        m_ptr = new T[m_rows * m_columns];
         for (int i = 0; i < m_rows; ++i) {
-            m_ptr[i] = new T[m_columns];
             for (int j = 0; j < m_columns; ++j) {
-                m_ptr[i][j] = rhs.m_ptr[i][j];
+                m_ptr[i * m_columns + j] = rhs.m_ptr[i * m_columns + j];
             }
         }
 
@@ -126,42 +145,28 @@ public:
             return *this;
         }
 
-        for (int i = 0; i < m_rows; ++i) {
-            delete [] m_ptr[i];
-        }
         delete [] m_ptr;
 
         m_rows = rhs.m_rows;
         m_columns = rhs.m_columns;
 
-        m_ptr = new T*[m_rows];
-        for (int i = 0; i < m_rows; ++i) {
-            m_ptr[i] = new T[m_columns];
-            for (int j = 0; j < m_columns; ++j) {
-                m_ptr[i][j] = rhs.m_ptr[i][j];
-            }
-        }
+        m_ptr = rhs.m_ptr;
 
-        for (int i = 0; i < rhs.m_rows; ++i) {
-            delete [] rhs.m_ptr[i];
-        }
-        delete [] rhs.m_ptr;
+        rhs.m_ptr = nullptr;
+        rhs.m_rows = 0;
+        rhs.m_columns = 0;
 
         return *this;
     }
 
-    T & operator()(int i, int j){
-        return m_ptr[i][j];
-    }
-
-    const T & operator()(int i, int j) const {
-        return m_ptr[i][j];
-    }
 
     Matrix<T> & operator+=(const Matrix<T> & rhs) {
+        if (m_rows != rhs.m_rows || m_columns != rhs.m_columns) {
+            throw std::logic_error("dimensions are not equal\n");
+        }
         for (int i = 0; i < rhs.m_rows; ++i) {
             for (int j = 0; j < rhs.m_columns; ++j) {
-                this->m_ptr[i][j] += rhs.m_ptr[i][j];
+                this->m_ptr[i * m_columns + j] += rhs.m_ptr[i * m_columns + j];
             }
         }
         return *this;
@@ -174,9 +179,12 @@ public:
     // m = m1 + m2;
 
     Matrix<T> & operator-=(const Matrix<T> & rhs) {
+        if (m_rows != rhs.m_rows || m_columns != rhs.m_columns) {
+            throw std::logic_error("dimensions are not equal\n");
+        }
         for (int i = 0; i < rhs.m_rows; ++i) {
             for (int j = 0; j < rhs.m_columns; ++j) {
-                this->m_ptr[i][j] -= rhs.m_ptr[i][j];
+                this->m_ptr[i * m_columns + j] -= rhs.m_ptr[i * m_columns + j];
             }
         }
         return *this;
@@ -190,7 +198,7 @@ public:
     Matrix<T> & operator*=(T rhs) {
         for (int i = 0; i < rhs.m_rows; ++i) {
             for (int j = 0; j < rhs.m_columns; ++j) {
-                this->m_ptr[i][j] *= rhs;
+                this->m_ptr[i * m_columns + j] *= rhs;
             }
         }
         return *this;
@@ -201,12 +209,20 @@ public:
         return lhs;
     }
 
+    friend Matrix<T> operator*(T lhs, Matrix<T> rhs) {
+        rhs *= lhs;
+        return rhs;
+    }
+
     friend Matrix<T> operator*(Matrix<T> lhs, const Matrix<T> & rhs) {
+        if (lhs.m_columns != rhs.m_rows) {
+            throw std::logic_error("dimensions are not equal\n");
+        }
         Matrix<T> tmp(lhs.m_rows, rhs.m_columns);
         for (int i = 0; i < lhs.m_rows; ++i) {
             for (int j = 0; j < rhs.m_columns; ++j) {
                 for (int k = 0; k < lhs.m_columns; ++k) {
-                    tmp[i][j] += lhs.m_ptr[i][k] * rhs.m_ptr[k][j];
+                    tmp(i, j) += lhs.m_ptr[i * lhs.m_columns + k] * rhs.m_ptr[k * rhs.m_columns + j];
                 }
             }
         }
@@ -222,7 +238,7 @@ public:
         double t = 0;
 
         for (int i = 0; i < std::min(m_rows, m_columns); ++i) {
-            t += m_ptr[i][i];
+            t += m_ptr[i * m_columns + i];
         }
 
         return t;
