@@ -40,6 +40,7 @@ int main() {
 
     std::cout << power[0][0] << " " << power[0][1] << "\n" << power[1][0] << " " << power[1][1] << "\n";
     */
+/*
     linalg::Matrix<int> check(1, 1);
     check(0, 0) = 2;
     std::cout << check(0, 0) << "\n";
@@ -90,6 +91,31 @@ int main() {
     std::cout << t.norm() << "\n";
 
     std::cout << t << "\n";
+
+    linalg::Matrix<int> init = {{1, 6, 5}, {4, 2, 7}, {7, 4, 5}};
+    linalg::Matrix<int> power = pow(init, 3);
+
+    std::cout << power << "\n";
+    std::cout << init * init * init << "\n";
+
+    linalg::Matrix<int> mat = {{1, 6, 5}, {4, 2, 7}, {1, 6, 5}};
+
+    std::cout << init.rank() << "\n" << mat.rank() << "\n";
+
+    std::cout << inv(init) << "\n";
+
+    linalg::Matrix<double> dd = {{1, 6, 5}, {4, 2, 7}, {7, 4, 5}};
+
+    std::cout << dd * inv(init) << "\n";
+
+    */
+
+    linalg::Matrix<Complex<int>> init = {{Complex<int>(1, 1), Complex<int>(6, 6), Complex<int>(5, 5)},
+                         {Complex<int>(4, 4), Complex<int>(2, 2), Complex<int>(7, 7)},
+                         {Complex<int>(7, 7), Complex<int>(4, 4), Complex<int>(5, 5)}};
+
+    std::cout << init << "\n";
+    std::cout << init.det() << "\n" << init.norm() << "\n" << init.trace() << "\n" << init.rank() << "\n" << inv(init) << "\n";
 
     return 0;
 }
