@@ -1,4 +1,7 @@
 #pragma once
+#include <cmath>
+#include <iomanip>
+
 
 template <class T = double>
 class Complex {
@@ -95,8 +98,8 @@ public:
     Complex<T> & operator*=(Complex<T> other) {
         T a = this->re;
         T b = this->im;
-        T c = this->re;
-        T d = this->im;
+        T c = other.re;
+        T d = other.im;
 
         // (a + bi)(c + di) = ac - bd + i(ad + bc);
         this->re = a * c - b * d;
@@ -109,4 +112,28 @@ public:
         return lhs;
     }
 
+    friend std::ostream & operator<<(std::ostream & out, const Complex<T> & c) {
+        if (c.re >= 0) {
+            if (c.im >= 0) {
+                out << std::scientific << std::setprecision(4) << " " << c.re << " " << "+ " << c.im << " * i ";
+            }
+            else {
+                out << std::scientific << std::setprecision(4) << " " << c.re << " " << "- " << -c.im << " * i ";
+            }
+        }
+        else {
+            if (c.im >= 0) {
+                out << std::scientific << std::setprecision(4) << "-" << -c.re << " " << "+ " << c.im << " * i ";
+            }
+            else {
+                out << std::scientific << std::setprecision(4) << "-" << -c.re << " " << "- " << -c.im << " * i ";
+            }
+        }
+
+        return out;
+    }
+
+    double abs() {
+        return sqrt(re * re + im * im);
+    }
 };
