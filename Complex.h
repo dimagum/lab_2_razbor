@@ -17,11 +17,19 @@ public:
         return re;
     }
 
+    T real() const {
+        return re;
+    }
+
     void real(T r) {
         this->re = r;
     }
 
     T imag() {
+        return im;
+    }
+
+    T imag() const {
         return im;
     }
 
