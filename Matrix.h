@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include <iomanip>
+#include "Complex.h"
 
 namespace linalg {
     template<class T = double>
