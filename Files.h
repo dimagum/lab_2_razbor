@@ -261,7 +261,7 @@ namespace linalg {
                 std::getline(file, line);
                 std::string number = "";
                 for (char symbol : line) {
-                    if ((symbol - '0') >= 0 && (symbol - '0') <= 9 || symbol == '.' || symbol == '-' || symbol == 'e' || symbol == '+') {
+                    if ((symbol - '0') >= 0 && (symbol - '0') <= 9 || symbol == '.' || symbol == '-' || symbol == 'e' || symbol == '+') { // e+4   e-3
                         number += symbol;
                     }
                     else if (!number.empty()) {
@@ -381,8 +381,5 @@ namespace linalg {
             return tmp;
         }
     };
-
-
-
 }
 

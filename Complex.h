@@ -37,7 +37,7 @@ public:
         this->im = i;
     }
 
-    Complex<T> & operator=(T other){
+    Complex<T> & operator=(T other) {
         this->re = other;
         this->im = 0;
         return *this;

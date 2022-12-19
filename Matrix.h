@@ -6,7 +6,7 @@
 namespace linalg {
     template<class T = double>
     class Matrix {
-        T *m_ptr;
+        T* m_ptr;
         unsigned m_rows;
         unsigned m_columns;
     public:
@@ -23,7 +23,7 @@ namespace linalg {
             }
         }
 
-        Matrix(const Matrix<T> &other) {
+        Matrix(const Matrix<T>& other) {  // конструктор копирования
             m_rows = other.m_rows;
             m_columns = other.m_columns;
 
@@ -34,10 +34,10 @@ namespace linalg {
                     m_ptr[i * m_columns + j] = other.m_ptr[i * m_columns + j];
                 }
             }
-        }
+        }  // Matrix<int> m1(m0);
 
-        Matrix(Matrix<T> &&other) { // && - r-value ссылка;
-            m_rows = other.m_rows;
+        Matrix(Matrix<T>&& other) { // && - r-value ссылка;   Matrix<int> m1(std::move(m0));
+            m_rows = other.m_rows;  // std::move
             m_columns = other.m_columns;
             m_ptr = other.m_ptr;
 
@@ -46,7 +46,7 @@ namespace linalg {
             other.m_columns = 0;
         }
 
-        Matrix(const std::initializer_list<T> &lst) {
+        Matrix(const std::initializer_list<T>& lst) {  // Matrix<int> m = {1, 2, 3, 4, 5, 6};
             m_rows = lst.size();
             m_columns = 1;
             m_ptr = new T[m_rows * m_columns];
@@ -55,7 +55,7 @@ namespace linalg {
             }
         }
 
-        Matrix(const std::initializer_list<std::initializer_list<T>> &lst) {
+        Matrix(const std::initializer_list<std::initializer_list<T>>& lst) {  // Matrix<int> m = {{1, 2, 3}, {4, 5, 6}};
             m_rows = lst.size();
             m_columns = lst.begin()->size();
 
@@ -65,7 +65,6 @@ namespace linalg {
                     m_ptr[i * m_columns + j] = *((lst.begin() + i)->begin() + j);
                 }
             }
-
         }
 
         ~Matrix() {
@@ -86,21 +85,21 @@ namespace linalg {
         }
 
         // m(1, 1);
-        T &operator()(int i, int j) {
+        T& operator()(int i, int j) {
             if (i >= m_rows || j >= m_columns) {
                 throw std::logic_error("index out of range\n");
             }
             return m_ptr[i * m_columns + j];
-        }
+        } // m(1, 1) = 4;
 
-        const T &operator()(int i, int j) const {
+        const T& operator()(int i, int j) const {
             if (i >= m_rows || j >= m_columns) {
                 throw std::logic_error("index out of range\n");
             }
             return m_ptr[i * m_columns + j];
-        }
+        } // m(1, 1) = 4; - ошибка!
 
-        Matrix<T> &operator=(const Matrix<T> &rhs) {
+        Matrix<T>& operator=(const Matrix<T>& rhs) {  // копирующее присваивание
             if (this == &rhs) {
                 return *this;
             }
@@ -118,9 +117,11 @@ namespace linalg {
             }
 
             return *this;
-        }
+        }  // m = m0;
+           // m0 = m0;
 
-        Matrix<T> &operator=(Matrix<T> &&rhs) noexcept {
+        // перемещающее присваивание
+        Matrix<T> &operator=(Matrix<T>&& rhs) noexcept { // m = std::move(m0);
             if (this == &rhs) {
                 return *this;
             }
@@ -137,10 +138,10 @@ namespace linalg {
             rhs.m_columns = 0;
 
             return *this;
-        }
+        }   // m0 = std::move(m0);
 
 
-        Matrix<T> &operator+=(const Matrix<T> &rhs) {
+        Matrix<T>& operator+=(const Matrix<T>& rhs) {
             if (m_rows != rhs.m_rows || m_columns != rhs.m_columns) {
                 throw std::logic_error("dimensions are not equal\n");
             }
@@ -150,15 +151,15 @@ namespace linalg {
                 }
             }
             return *this;
-        }
+        }  // m1 += m2;
 
-        friend Matrix<T> operator+(Matrix<T> lhs, const Matrix<T> &rhs) {
+        friend Matrix<T> operator+(Matrix<T> lhs, const Matrix<T>& rhs) {
             lhs += rhs;
             return lhs;
         }
         // m = m1 + m2;
 
-        Matrix<T> &operator-=(const Matrix<T> &rhs) {
+        Matrix<T> &operator-=(const Matrix<T>& rhs) {
             if (m_rows != rhs.m_rows || m_columns != rhs.m_columns) {
                 throw std::logic_error("dimensions are not equal\n");
             }
@@ -170,31 +171,31 @@ namespace linalg {
             return *this;
         }
 
-        friend Matrix<T> operator-(Matrix<T> lhs, const Matrix<T> &rhs) {
+        friend Matrix<T> operator-(Matrix<T> lhs, const Matrix<T>& rhs) {
             lhs -= rhs;
             return lhs;
         }
 
-        Matrix<T> &operator*=(T rhs) {
+        Matrix<T>& operator*=(T rhs) {
             for (int i = 0; i < rhs.m_rows; ++i) {
                 for (int j = 0; j < rhs.m_columns; ++j) {
                     this->m_ptr[i * m_columns + j] *= rhs;
                 }
             }
             return *this;
-        }
+        } // m *= k;
 
         friend Matrix<T> operator*(Matrix<T> lhs, T rhs) {
             lhs *= rhs;
             return lhs;
-        }
+        } // m = m1 * k;
 
         friend Matrix<T> operator*(T lhs, Matrix<T> rhs) {
             rhs *= lhs;
             return rhs;
         }
 
-        friend Matrix<T> operator*(Matrix<T> lhs, const Matrix<T> &rhs) {
+        friend Matrix<T> operator*(Matrix<T> lhs, const Matrix<T>& rhs) {
             if (lhs.m_columns != rhs.m_rows) {
                 throw std::logic_error("dimensions are not equal\n");
             }
@@ -209,7 +210,7 @@ namespace linalg {
             return tmp;
         }
 
-        friend std::ostream &operator<<(std::ostream &out, const Matrix<T> &m) {
+        friend std::ostream& operator<<(std::ostream& out, const Matrix<T>& m) {
             for (int i = 0; i < m.m_rows; ++i) {
                 out << '|';
                 for (int j = 0; j < m.m_columns; ++j) {
@@ -219,9 +220,10 @@ namespace linalg {
                 out << "|\n";
             }
             return out;
-        }
+        } // std::cout << m1 << m2 << 1;
 
-        friend void getMat(const Matrix<T> &m, Matrix<T> &t, int p, int q) {
+        // 7 пункт
+        friend void getMat(const Matrix<T>& m, Matrix<T>& t, int p, int q) {
             unsigned n = m.m_rows;
             int i = 0, j = 0;
 
@@ -291,7 +293,7 @@ namespace linalg {
             return tmp;
         }
 
-        friend Matrix<T> pow(const Matrix<T> &m, unsigned p) {
+        friend Matrix<T> pow(const Matrix<T>& m, unsigned p) {
             Matrix<T> tmp(m);
 
             for (int i = 0; i < p - 1; ++i) {
@@ -301,11 +303,6 @@ namespace linalg {
             return tmp;
         }
 
-        // friend void row_swap(Matrix<> & to_swap, int r1, int r2, int c) {
-        //     for (int i = 0; i < c; ++i) {
-        //         std::swap(to_swap(r1, i), to_swap(r2, i));
-        //     }
-        // }
 
         int rank() {
             Matrix<> tmp(m_rows, m_columns);
@@ -333,7 +330,6 @@ namespace linalg {
                     bool to_reduce = true;
                     for (int i = row + 1; i < m_rows; ++i) {
                         if (tmp(i, row)) {
-                            // row_swap(tmp, row, i, r);
                             for (int k = 0; i < r; ++i) {
                                 std::swap(tmp(row, k), tmp(i, k));
                             }
@@ -356,12 +352,6 @@ namespace linalg {
         }
 
         friend void get_adj(const Matrix<T> & mat, Matrix<> & res) {
-            if (mat.m_rows != res.m_rows || mat.m_columns != res.m_columns) {
-                throw std::logic_error("matrix dimensions are not matching\n");
-            }
-            if (mat.m_rows != res.m_columns) {
-                throw std::logic_error("not a square matrix\n");
-            }
             T mat_det = mat.det();
             for (int i = 0; i < res.m_rows; ++i) {
                 for (int j = 0; j < res.m_columns; ++j) {
@@ -388,7 +378,7 @@ namespace linalg {
 
     template<class T>
     class Matrix<Complex<T>> {
-        Complex<T> *m_ptr;
+        Complex<T>* m_ptr;
         unsigned m_rows;
         unsigned m_columns;
     public:
